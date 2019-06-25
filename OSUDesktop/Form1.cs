@@ -19,7 +19,7 @@ namespace OSUDesktop
         */
 
         [Flags]
-        public enum SendMessageTimeoutFlags : uint
+        internal enum SendMessageTimeoutFlags : uint
         {
             SMTO_NORMAL = 0x0,
             SMTO_BLOCK = 0x1,
@@ -29,9 +29,10 @@ namespace OSUDesktop
         }
 
         internal const uint GW_OWNER = 4;
+        internal const int WM_CLOSE = 0x10; // ExitWindows函数
 
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
-        public static extern IntPtr FindWindow([MarshalAs(UnmanagedType.LPTStr)] string lpClassName, [MarshalAs(UnmanagedType.LPTStr)] string lpWindowName);
+        internal static extern IntPtr FindWindow([MarshalAs(UnmanagedType.LPTStr)] string lpClassName, [MarshalAs(UnmanagedType.LPTStr)] string lpWindowName);
 
         [DllImport("user32.dll", CharSet = CharSet.Auto)]
         internal static extern int GetWindowThreadProcessId(IntPtr hWnd, out IntPtr lpdwProcessId);
@@ -43,21 +44,26 @@ namespace OSUDesktop
         internal static extern bool IsWindowVisible(IntPtr hWnd);
 
         [DllImport("user32.dll", EntryPoint = "SendMessage")]
-        private static extern int SendMessage(IntPtr hWnd, int msg, uint wParam, uint lParam);
+        internal static extern int SendMessage(IntPtr hWnd, int msg, uint wParam, uint lParam);
 
         [DllImport("user32")]
-        private static extern IntPtr FindWindowEx(IntPtr hWnd1, IntPtr hWnd2, string lpsz1, string lpsz2);
+        internal static extern IntPtr FindWindowEx(IntPtr hWnd1, IntPtr hWnd2, string lpsz1, string lpsz2);
 
         [DllImport("user32.dll")]
-        public static extern IntPtr SetParent(IntPtr hWndChild, IntPtr hWndNewParent);
+        internal static extern IntPtr SetParent(IntPtr hWndChild, IntPtr hWndNewParent);
 
         [DllImport("user32.dll", SetLastError = true, CharSet = CharSet.Auto)]
-        public static extern IntPtr SendMessageTimeout(IntPtr windowHandle, uint Msg, IntPtr wParam, IntPtr lParam, SendMessageTimeoutFlags flags, uint timeout, out IntPtr result);
+        internal static extern IntPtr SendMessageTimeout(IntPtr windowHandle, uint Msg, IntPtr wParam, IntPtr lParam, SendMessageTimeoutFlags flags, uint timeout, out IntPtr result);
 
         [DllImport("user32.dll")]
         [return: MarshalAs(UnmanagedType.Bool)]
-        public static extern bool EnumWindows(EnumWindowsProc lpEnumFunc, IntPtr lParam);
-        public delegate bool EnumWindowsProc(IntPtr hwnd, IntPtr lParam);
+        internal static extern bool EnumWindows(EnumWindowsProc lpEnumFunc, IntPtr lParam);
+        internal delegate bool EnumWindowsProc(IntPtr hwnd, IntPtr lParam);
+
+        int ModeA_PID = 0;
+        string ModeA_Name = "";
+        private static Boolean winseven = false;
+        IntPtr WorkerWIntPtr = fWorker(); // 定义句柄并设置为桌面WorkerW的句柄
 
         public Form1()
         {
@@ -69,7 +75,7 @@ namespace OSUDesktop
             openFileDialog1.ShowDialog(); // 显示选取对话框
         }
 
-        public static System.Diagnostics.Process p; // 定义进程p
+        private static System.Diagnostics.Process p; // 定义进程p
 
         StartMode cmode;
 
@@ -79,9 +85,6 @@ namespace OSUDesktop
             ModeB, // 传统模式
         }
 
-        int ModeA_PID = 0;
-        string ModeA_Name = "";
-
         private void openFileDialog1_FileOk(object sender, CancelEventArgs e)
         {
             MessageBox.Show("请先将游戏设置为无边框窗口全屏，然后在系统托盘设置壁纸即可~");
@@ -90,10 +93,6 @@ namespace OSUDesktop
             Hide(); // 隐藏窗口
             notifyIcon1.Visible = true; // 显示托盘图标
         }
-
-        public static Boolean winseven = false;
-
-        IntPtr WorkerWIntPtr = fWorker(); // 定义句柄并设置为桌面WorkerW的句柄
 
         private void Form1_Load(object sender, EventArgs e)
         {
@@ -122,7 +121,7 @@ namespace OSUDesktop
             }
         }
 
-        public static IntPtr fWorker()
+        private static IntPtr fWorker()
         {
 
             IntPtr workerw = IntPtr.Zero;
@@ -132,7 +131,7 @@ namespace OSUDesktop
             IntPtr result = IntPtr.Zero;
 
             SendMessageTimeout(progman,
-                       0x052C,//用户码
+                       0x052C, // 用户码
                        new IntPtr(0),
                        IntPtr.Zero,
                        SendMessageTimeoutFlags.SMTO_NORMAL,
@@ -185,7 +184,7 @@ namespace OSUDesktop
             // Console.WriteLine(list[0]);
         }
 
-        public static IntPtr GetMainWindowHandle(int processId)
+        private static IntPtr GetMainWindowHandle(int processId)
         {
             IntPtr MainWindowHandle = IntPtr.Zero;
             EnumWindows(new EnumWindowsProc((hWnd, lParam) =>
@@ -230,9 +229,6 @@ namespace OSUDesktop
         {
             SetParent(p.MainWindowHandle, WorkerWIntPtr); // 设置父窗体为桌面（注入WorkerW）
         }
-
-        public const int WM_CLOSE = 0x10;
-        // ExitWindows函数
 
         private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
         {
