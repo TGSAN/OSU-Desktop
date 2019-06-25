@@ -1,9 +1,0 @@
-J:\文件\项目\OSUDesktop\OSUDesktop\bin\Debug\OSUDesktop.exe
-J:\文件\项目\OSUDesktop\OSUDesktop\bin\Debug\OSUDesktop.pdb
-J:\文件\项目\OSUDesktop\OSUDesktop\obj\Debug\OSUDesktop.csprojResolveAssemblyReference.cache
-J:\文件\项目\OSUDesktop\OSUDesktop\obj\Debug\OSUDesktop.Form1.resources
-J:\文件\项目\OSUDesktop\OSUDesktop\obj\Debug\OSUDesktop.Properties.Resources.resources
-J:\文件\项目\OSUDesktop\OSUDesktop\obj\Debug\OSUDesktop.csproj.GenerateResource.Cache
-J:\文件\项目\OSUDesktop\OSUDesktop\obj\Debug\OSUDesktop.exe
-J:\文件\项目\OSUDesktop\OSUDesktop\obj\Debug\OSUDesktop.pdb
-J:\文件\项目\OSUDesktop\OSUDesktop\bin\Debug\OSUDesktop.exe.config
